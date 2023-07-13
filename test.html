@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <title>test</title>
+  <link rel="stylesheet" href="css/main.css" media="screen">
+  <link rel="stylesheet" href="css/test.css" media="screen">
+  <meta name="referrer" content="origin">
+  <link id="u-theme-google-font" rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+  <meta name="theme-color" content="#478ac9">
+  <meta property="og:title" content="test">
+  <meta property="og:type" content="website">
+  <meta data-intl-tel-input-cdn-path="intlTelInput/">
+</head>
+
+<body class="u-body u-xl-mode" data-lang="en">
+  <header class="u-black u-clearfix u-header u-header" id="sec-47a8">
+    <div class="u-clearfix u-sheet u-sheet-1">
+      <p class="u-text u-text-default u-text-1">Test Platform</p>
+    </div>
+  </header>
+  <section class="u-clearfix u-section-1" id="sec-e566">
+    <div class="u-clearfix u-sheet u-sheet-1">
+      <div class="u-form u-form-1">
+        <form class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form"
+          id="scanner_id_form" style="padding: 10px;">
+          <div class="u-form-group u-form-name">
+            <label for="name-3425" class="u-label">Onboard URL</label>
+            <input type="text" placeholder="https://url.com/onboarding?api_key=hmm" id="onboard_url" name="scanner_id"
+              class="u-input u-input-rectangle" required="">
+          </div>
+          <div class="u-form-group u-form-name">
+            <label for="name-3425" class="u-label">Scanner ID</label>
+            <input type="text" placeholder="AA:BB:CC:DD:EE:FF" id="scanner_id" name="scanner_id"
+              class="u-input u-input-rectangle" required="">
+          </div>
+          <div class="u-form-group u-form-name">
+            <label for="name-3425" class="u-label">Scanner Secret</label>
+            <input type="text" placeholder="Secret" id="scanner_secret" name="scanner_id"
+              class="u-input u-input-rectangle" required="">
+          </div>
+          <div class="u-form-checkbox u-form-group u-form-group-2">
+            <input type="checkbox" id="already_exists" name="scanner_exists" class="u-field-input">
+            <label for="checkbox-946b" class="u-field-label">Scanner Already Exists</label>
+          </div>
+          <div class="u-align-left u-form-group u-form-submit">
+            <button id="set_active_scanner"
+              class="u-black u-border-none u-btn u-btn-submit u-button-style u-hover-grey-80 u-btn-1">Set
+              Active Scanner</button>
+          </div>
+        </form>
+      </div>
+      <div class="u-form u-form-2">
+        <form id="send_qr_active_scanner" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form-1"
+          style="padding: 10px;">
+          <div class="u-form-group u-form-message">
+            <label for="message-c59c" class="u-label">QR Code</label>
+            <textarea placeholder="Copy the QR Code Here" rows="4" cols="50"  name="qr_code"
+              class="u-input u-input-rectangle" id = "qr_code_value" required=""></textarea>
+          </div>
+          <div class="u-form-checkbox u-form-group u-form-group-5">
+            <input type="checkbox" id="network_connected" name="network_state" class="u-field-input" checked="checked">
+            <label for="checkbox-ef33" class="u-field-label">Network Connection</label>
+          </div>
+          <div class="u-align-left u-form-group u-form-submit">
+            <button type="submit" 
+              class="u-black u-btn u-btn-submit u-button-style u-hover-grey-80 u-btn-2" data-animation-name=""
+              data-animation-duration="0" data-animation-delay="0" data-animation-direction="">Send To Active
+              Scanner</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="u-clearfix u-section-2" id="sec-4a2d">
+    <div class="u-clearfix u-sheet u-sheet-1">
+      <div class="u-form u-form-1">
+        <form class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form"
+          id="new_lock_form" style="padding: 10px;">
+          <div class="u-form-group u-form-name">
+            <label for="name-3425" class="u-label">Lock ID</label>
+            <input type="text" placeholder="AA:BB:CC:DD:EE:FF" id="new_lock_id" name="new_lock_id"
+              class="u-input u-input-rectangle" required="">
+          </div>
+          <div class="u-form-group u-form-name">
+            <label for="name-3425" class="u-label">Lock Secret</label>
+            <input type="text" placeholder="Secret" id="new_lock_secret" name="new_lock_secret"
+              class="u-input u-input-rectangle" required="">
+          </div>
+          <div class="u-align-left u-form-group u-form-submit">
+            <button type="submit" class="u-black u-btn u-btn-submit u-button-style u-hover-grey-80 u-btn-1"
+              data-animation-name="" data-animation-duration="0" data-animation-delay="0"
+              data-animation-direction="">Add Lock to network</button>
+          </div>
+          <div class="u-form-checkbox u-form-group u-form-group-2">
+            <label for="checkbox-946b" class="u-field-label">Note: Locks Must be Manually Added to Scanner Group to
+              be Added Below</label>
+          </div>
+        </form>
+      </div>
+      <h5 class="u-text u-text-default u-text-1">Active Locks</h5>
+      <div style="overflow-y: scroll; height: 100px;"
+        class="u-border-2 u-border-grey-75 u-container-style u-group u-radius-14 u-shape-round u-group-1"
+        data-animation-name="customAnimationIn" data-animation-duration="1000">
+        <div class="u-container-layout u-container-layout-1">
+          <div class="u-expanded-width u-list u-list-1">
+            <div id="lock_container" class="u-repeater u-repeater-1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/set_active_scanner.js"></script>
+  <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-29f2">
+    <div class="u-clearfix u-sheet u-sheet-1"></div>
+  </footer>
+</body>
+
+<!-- template -->
+<div id="lock_template" style="display: none; height: 120px;" data-section="lock" data-type="template"
+  class="u-container-style u-list-item u-palette-5-light-3 u-repeater-item u-list-item-1">
+  <div class="u-container-layout u-similar-container u-container-layout-2 ">
+    <button disabled="true" onclick="occupy_lock_handler(id)"
+      class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-2 occupy_lock_button">OCCUPY
+      BATHROOM</button>
+    <h6 class="u-text u-text-default u-text-2 lock_id_title">AA:BB:DD:EE:FF:EE</h6>
+    <button disabled="true" onclick="exit_lock_handler(id)"
+      class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-3 exit_lock_button">EXIT</button>
+  </div>
+</div>
+
+</html>
