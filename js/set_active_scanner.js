@@ -558,7 +558,6 @@ send_to_scanner_form.addEventListener("submit", async function (event) {
     //Try Zakat first:
     let base64_qr_code = qr_code_value.value;
     while (base64_qr_code.slice(-1) === "\n") {
-        console.log("removing new Line")
         base64_qr_code = base64_qr_code.substring(0, base64_qr_code.length - 1);
     }
     try {
