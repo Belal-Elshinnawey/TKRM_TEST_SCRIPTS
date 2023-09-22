@@ -516,7 +516,7 @@ function handle_zakat_qr_codes(decoded_qr) {
     }
     console.log(date_string_value)
     var received_datetime = new Date(date_string_value)
-    var current_time = new Date(date_string_value)
+    var current_time = new Date();
     var diff = (received_datetime.getTime() - current_time.getTime()) / 1000;
     diff /= (60 * 60);
     diff = Math.abs(Math.round(diff));
