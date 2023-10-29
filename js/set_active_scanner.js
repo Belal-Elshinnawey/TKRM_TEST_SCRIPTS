@@ -53,7 +53,7 @@ function get_current_event_time() {
         minimumIntegerDigits: 2,
         useGrouping: false
     })}`;
-    console.log("Current time generated is: " + currentDate)
+    //console.log("Current time generated is: " + currentDate)
     return currentDate;
 }
 
@@ -107,7 +107,7 @@ async function decrypt128(data, key, iv) {
 }
 
 function display_lock_list() {
-    console.log(lock_list)
+    //console.log(lock_list)
     var docFrag = document.createDocumentFragment();
     lock_list.forEach(element => {
         var tempNode = document.querySelector("div[data-type='template']").cloneNode(true); //true for deep clone
@@ -137,6 +137,7 @@ function connect_response_handler(connect_resp) {
     establishment_name = connect_resp["establishment_name"];
     for (var i = 0; i < connect_resp["list_of_locks"].length; i++) {
         //Remove Old Locks object.
+        connect_resp["list_of_locks"][i] = connect_resp["list_of_locks"][i].split('-')[0]
         const objWithIdIndex = lock_list.findIndex((obj) => obj.id === connect_resp["list_of_locks"][i]);
         if (objWithIdIndex == -1) {
             const new_lock = {
@@ -173,12 +174,12 @@ function websocket_setup(device_id, device_secret) {
             "device_id": device_id,
             "message_type": "CONNECT"
         };
-        console.log(`Sending Connect message: ${(connect_message.toString())}`)
+        //console.log(`Sending Connect message: ${(connect_message.toString())}`)
         socket.send(JSON.stringify(connect_message));
     };
     //Setup event handler
     socket.onmessage = function (event) {
-        console.log(`[message] Data received from server: ${(event.data)}`);
+        //console.log(`[message] Data received from server: ${(event.data)}`);
         payload = JSON.parse(event.data);
         switch (payload["message_type"]) {
             case "CONNECTRESP": {
@@ -294,7 +295,7 @@ new_lock_form.addEventListener("submit", function (event) {
 
 
 function occupy_lock_handler(id) {
-    console.log("Handling Occupy");
+    //console.log("Handling Occupy");
     //Change Status to Occupied
     lock_list.forEach(element => {
         if (element.id === id) {
@@ -320,7 +321,7 @@ function occupy_lock_handler(id) {
     }
 }
 function exit_lock_handler(id) {
-    console.log(id);
+    //console.log(id);
     //Change Status to Unoccupied
     //Change Status to Occupied
     lock_list.forEach(element => {
@@ -363,7 +364,7 @@ networ_is_connected.addEventListener('change', (event) => {
 
 function close_device(id) {
     // Close door.
-    console.log("timeout closing door");
+    //console.log("timeout closing door");
     lock_list.forEach(element => {
         if (element.id === id) {
             element["open"] = false;
@@ -405,21 +406,54 @@ function open_all_unocupied_devices() {
     display_lock_list();
 }
 
-function find_device_and_open(base64_qr_code) {
+function find_device_and_open(base64_qr_code, type) {
     for (var i = 0; i < lock_list.length; i++) {
         if (lock_list[i]["occupied"] === false && lock_list[i]["open"] === false) {
-            console.log("found an unoccupied device");
+            //console.log("found an unoccupied device");
             lock_list[i]["open"] = true;
             const qr_read_event = {
                 "message_type": "QRUSED",
                 "device_id": scanner_id.value,
-                "qr_value": (base64_qr_code),
+                "used_device": lock_list[i]["id"],
                 "generated_time": get_current_event_time(),
-                "used_device": lock_list[i]["id"]
             }
-            if (netwrok_connected_status && socket !== undefined) {
-                console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
+            //If type is tkrm: get token and set purchase_time,vat_amount,total_amount to blank
+            if (type === "tkrm") {
+                qr_read_event["purchase_time"] = ""
+                qr_read_event["vat_amount"] = ""
+                qr_read_event["total_amount"] = ""
+                qr_read_event["token"] = base64_qr_code.slice(0, 16)
+            }
+            //If type is zakat: get purchase_time,vat_amount,total_amount and set token to blank
+            else {
+                var raw_hex_array =Array.from(new Uint8Array(base64ToArrayBuffer(base64_qr_code)));
+                while (raw_hex_array.length > 0) {
+                    tag = raw_hex_array.shift()
+                    length = raw_hex_array.shift()
+                    value = raw_hex_array.splice(0, length)
+                    value_string = String.fromCharCode(...value)
+                    switch (tag) {
+                        case 3: {
+                            qr_read_event["purchase_time"] = value_string
+                            break;
+                        }
+                        case 4: {
+                            qr_read_event["total_amount"] = value_string
+                            break;
+                        }
+                        case 5: {
+                            qr_read_event["vat_amount"] = value_string
+                            break;
+                        }
+                    }
+                }
+                qr_read_event["token"] = ""
                 console.log(qr_read_event)
+            }
+
+            if (netwrok_connected_status && socket !== undefined) {
+                //console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
+                //console.log(qr_read_event)
                 socket.send(JSON.stringify(qr_read_event))
             }
             //if not, Keep event data.
@@ -440,20 +474,24 @@ function find_device_and_open(base64_qr_code) {
 }
 
 function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
-    console.log("TKRM QR Code: " + decoded_qr)
+    //console.log("TKRM QR Code: " + decoded_qr)
     if (decoded_qr.includes("1970-01-01T00:00:00")) {
-        console.log("TRKR QR is Force ALL");
+        //console.log("TRKR QR is Force ALL");
         //type 3, force open all
 
         const qr_read_event = {
             "message_type": "QRUSED",
             "device_id": scanner_id.value,
-            "qr_value": (base64_qr_code),
+            "used_device": "FF:FF:FF:FF:FF:FF",
+            // "qr_value": (base64_qr_code), (Removed)
+            "purchase_time": "",
             "generated_time": get_current_event_time(),
-            "used_device": "ALL"
+            "vat_amount": "",
+            "total_amount": "",
+            "token": base64_qr_code.slice(0, 16)
         }
         if (netwrok_connected_status && socket !== undefined) {
-            console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
+            //console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
             socket.send(JSON.stringify(qr_read_event))
         }
         //if not, Keep event data.
@@ -462,18 +500,22 @@ function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
         }
         open_all_devices();
     } else if (decoded_qr.includes("1970-01-02T00:00:00")) {
-        console.log("TRKR QR is Force ALL Unless Occupied");
+        //console.log("TRKR QR is Force ALL Unless Occupied");
         //type 4, open all unoccupied
         const qr_read_event = {
             "message_type": "QRUSED",
             "device_id": scanner_id.value,
-            "qr_value": (base64_qr_code),
+            "used_device": "FF:FF:FF:FF:FF:FF",
+            //  "qr_value": (base64_qr_code), (Removed)
+            "purchase_time": "",
             "generated_time": get_current_event_time(),
-            "used_device": "ALL"
+            "vat_amount": "",
+            "total_amount": "",
+            "token": base64_qr_code.slice(0, 16)
         }
-        console.log(qr_read_event)
+        //console.log(qr_read_event)
         if (netwrok_connected_status && socket !== undefined) {
-            console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
+            //console.log("Sending Event to Server " + JSON.stringify(qr_read_event));
             socket.send(JSON.stringify(qr_read_event))
         }
         //if not, Keep event data.
@@ -482,7 +524,7 @@ function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
         }
         open_all_unocupied_devices();
     } else {
-        console.log("TRKR QR is Open 1");
+        //console.log("TRKR QR is Open 1");
         const received_time_string = decoded_qr.substring(39);
         const received_time = new Date(received_time_string + "+00:00");
         const current_time = new Date();
@@ -491,8 +533,8 @@ function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
         diff /= (60 * 60);
         diff = Math.abs(Math.round(diff));
         if (diff < 4) {
-            console.log("TRKR Open 1 is less than 4 hours " + decoded_qr);
-            find_device_and_open((base64_qr_code))
+            //console.log("TRKR Open 1 is less than 4 hours " + decoded_qr);
+            find_device_and_open((base64_qr_code), "tkrm")
         } else {
             alert("This TKRM QR Code is too old");
         }
@@ -501,7 +543,7 @@ function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
 
 function handle_zakat_qr_codes(decoded_qr) {
     let hex_qr = base64ToHex(decoded_qr)
-    console.log(hex_qr)
+    //console.log(hex_qr)
     //Extract time string first
     let start_index = 0
     var date_string_value = ""
@@ -514,14 +556,14 @@ function handle_zakat_qr_codes(decoded_qr) {
         }
         start_index = start_index + 4 + (parseInt(val_length, 16) * 2);
     }
-    console.log(date_string_value)
+    //console.log(date_string_value)
     var received_datetime = new Date(date_string_value)
     var current_time = new Date();
     var diff = (received_datetime.getTime() - current_time.getTime()) / 1000;
     diff /= (60 * 60);
     diff = Math.abs(Math.round(diff));
     if (diff < 4) {
-        find_device_and_open(decoded_qr)
+        find_device_and_open(decoded_qr, "zakat")
         return true;
     } else {
         alert("This Zakat QR Code is too old");
@@ -561,11 +603,12 @@ send_to_scanner_form.addEventListener("submit", async function (event) {
         base64_qr_code = base64_qr_code.substring(0, base64_qr_code.length - 1);
     }
     try {
-        console.log(base64ToHex(base64_qr_code).includes(establishment_name));
-        console.log((establishment_name));
+        
+        //console.log(base64ToHex(base64_qr_code).includes(establishment_name));
+        //console.log((establishment_name));
         if (base64ToHex(base64_qr_code).includes(establishment_name)) {
             // has to be type 2
-            console.log("Zakat QR Read");
+            //console.log("Zakat QR Read");
             if (!handle_zakat_qr_codes((base64_qr_code))) {
                 throw new Error('Parameter is not a Zakat QR');
             }
@@ -573,7 +616,7 @@ send_to_scanner_form.addEventListener("submit", async function (event) {
             throw new Error('Parameter is not a Zakat QR');
         }
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         //Didnt workout, try TKRM
         if (qr_code_value.value.length > 16) {
 
@@ -584,19 +627,18 @@ send_to_scanner_form.addEventListener("submit", async function (event) {
                 var decrypt_output = await decrypt128(data, secret_key, iv)
                 let dec = new TextDecoder();
                 var decoded_qr = dec.decode(decrypt_output);
-                console.log(decoded_qr);
                 if (decoded_qr.includes(token) && decoded_qr.includes(scanner_id.value)) {
                     //Either type 1, 3, 4
-                    console.log("TKRM QR Read");
+                    //console.log("TKRM QR Read");
                     handle_tkrm_qr_codes(decoded_qr, base64_qr_code);
                 } else {
                     alert("Invalid QR Code");
                 }
             } catch (error) {
-                alert("Error: Invalid QR Code");
+                alert(`Error: Invalid QR Code ${error}`);
             }
         } else {
-            alert("Error: Invalid QR Code");
+            alert("QR Code is too short");
         }
     }
 });
