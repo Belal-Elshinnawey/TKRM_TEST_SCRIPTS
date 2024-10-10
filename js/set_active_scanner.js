@@ -525,14 +525,10 @@ function handle_tkrm_qr_codes(decoded_qr, base64_qr_code) {
         open_all_unocupied_devices();
     } else {
         //console.log("TRKR QR is Open 1");
-        const received_time_string = decoded_qr.substring(39);
+        const received_time_string = decoded_qr.substring(39,39+19);
         const received_time = new Date(received_time_string + "+00:00");
         const current_time = new Date();
-        //type 1, check if time is within 4 hours, then find a single device to open
-        var diff = (received_time.getTime() - current_time.getTime()) / 1000;
-        diff /= (60 * 60);
-        diff = Math.abs(Math.round(diff));
-        if (diff < 4) {
+        if (received_time.getTime() > current_time.getTime()) {
             //console.log("TRKR Open 1 is less than 4 hours " + decoded_qr);
             find_device_and_open((base64_qr_code), "tkrm")
         } else {
